@@ -9,8 +9,12 @@ import at.ac.fhcampuswien.fhmdb.database.WatchlistRepository;
 import at.ac.fhcampuswien.fhmdb.models.Genre;
 import at.ac.fhcampuswien.fhmdb.models.Movie;
 import at.ac.fhcampuswien.fhmdb.models.SortedState;
+import at.ac.fhcampuswien.fhmdb.sort.SortState;
 import at.ac.fhcampuswien.fhmdb.ui.MovieCell;
 import at.ac.fhcampuswien.fhmdb.ui.UserDialog;
+import at.ac.fhcampuswien.fhmdb.sort.DescendingSortState;
+import at.ac.fhcampuswien.fhmdb.sort.AscendingSortState;
+import at.ac.fhcampuswien.fhmdb.sort.InitializeSortState;
 import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXComboBox;
 import com.jfoenix.controls.JFXListView;
@@ -55,6 +59,8 @@ public class MovieListController implements Initializable {
 
     protected SortedState sortedState;
 
+    private SortState sortState;
+
     private final ClickEventHandler onAddToWatchlistClicked = (clickedItem) -> {
         if (clickedItem instanceof Movie movie) {
             WatchlistMovieEntity watchlistMovieEntity = new WatchlistMovieEntity(
@@ -94,6 +100,8 @@ public class MovieListController implements Initializable {
 
         setMovies(result);
         setMovieList(result);
+
+        sortState = new InitializeSortState();
         sortedState = SortedState.NONE;
     }
 
@@ -148,12 +156,13 @@ public class MovieListController implements Initializable {
     // by default sorted state is NONE
     // afterwards it switches between ascending and descending
     public void sortMovies(SortedState sortDirection) {
+
         if (sortDirection == SortedState.ASCENDING) {
-            observableMovies.sort(Comparator.comparing(Movie::getTitle));
-            sortedState = SortedState.ASCENDING;
-        } else {
-            observableMovies.sort(Comparator.comparing(Movie::getTitle).reversed());
-            sortedState = SortedState.DESCENDING;
+            sortState = new AscendingSortState(observableMovies);
+            sortState.sort();
+        } else if (sortDirection == SortedState.DESCENDING) {
+            sortState = new DescendingSortState(observableMovies);
+            sortState.sort();
         }
     }
 
@@ -236,6 +245,9 @@ public class MovieListController implements Initializable {
     }
 
     public void sortBtnClicked(ActionEvent actionEvent) {
-        sortMovies();
+        sortMovies(SortedState.ASCENDING);
+    }
+    public void sortBtnClickedR(ActionEvent actionEvent) {
+        sortMovies(SortedState.DESCENDING);
     }
 }
