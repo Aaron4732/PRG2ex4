@@ -32,7 +32,7 @@ public class WatchlistController implements Initializable, Observer {
             WatchlistMovieEntity watchlistMovieEntity = (WatchlistMovieEntity) o;
 
             try {
-                WatchlistRepository watchlistRepository = new WatchlistRepository();
+                WatchlistRepository watchlistRepository = WatchlistRepository.getInstance();
                 watchlistRepository.removeFromWatchlist(watchlistMovieEntity);
                 observableWatchlist.remove(watchlistMovieEntity);
             } catch (DataBaseException e) {
@@ -49,7 +49,7 @@ public class WatchlistController implements Initializable, Observer {
 
         List<WatchlistMovieEntity> watchlist = new ArrayList<>();
         try {
-            watchlistRepository = new WatchlistRepository();
+            watchlistRepository = WatchlistRepository.getInstance();
             watchlistRepository.attach(this);
             watchlist = getWatchlist();
             observableWatchlist.addAll(getWatchlist());

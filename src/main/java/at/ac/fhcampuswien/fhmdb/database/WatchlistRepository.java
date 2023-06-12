@@ -12,10 +12,13 @@ import java.util.function.Consumer;
 public class WatchlistRepository implements Observable {
 
 
-    Dao<WatchlistMovieEntity, Long> dao;
+
+    private static WatchlistRepository instance;
+    private Dao<WatchlistMovieEntity, Long> dao;
     private List<Observer> observers;
 
-    public WatchlistRepository() throws DataBaseException {
+
+    private WatchlistRepository() throws DataBaseException {
         try {
             this.dao = DatabaseManager.getInstance().getWatchlistDao();
         } catch (Exception e) {
@@ -41,6 +44,13 @@ public class WatchlistRepository implements Observable {
         }
     }
 
+    public static synchronized WatchlistRepository getInstance() throws DataBaseException {
+        if (instance == null) {
+            instance = new WatchlistRepository();
+        }
+        return instance;
+    }
+
     public List<WatchlistMovieEntity> readWatchlist() throws DataBaseException {
         try {
             return dao.queryForAll();
@@ -49,6 +59,7 @@ public class WatchlistRepository implements Observable {
             throw new DataBaseException("Error while reading watchlist");
         }
     }
+
     public void addToWatchlist(WatchlistMovieEntity movie) throws DataBaseException {
         try {
             // only add movie if it does not exist yet
